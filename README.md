@@ -4,9 +4,10 @@ Connect AI assistants and automation tools to DATEV data through Klardaten.
 
 The Klardaten DATEV MCP Server provides access to DATEV data via the Klardaten
 DATEVconnect Gateway, with read access by default and optional creation of
-uncommitted accounting sequences (Buchungsstapel). It is built for German tax
-firms, accounting teams, and finance workflows that want to use DATEV data inside
-AI assistants, automation platforms, and MCP-compatible clients.
+uncommitted accounting sequences (Buchungsstapel). Accounts with the UI-agent
+features can also grant an assistant access to the DATEV desktop interface. It is
+built for German tax firms, accounting teams, and finance workflows that want to
+use DATEV inside AI assistants, automation platforms, and MCP-compatible clients.
 
 ## What You Can Do
 
@@ -19,6 +20,9 @@ Examples:
 - Review bookings, balances, open receivables, and open payables.
 - Create uncommitted accounting sequences for review in DATEV when the additional
   permission is granted.
+- Operate DATEV functions that have no supported data API when the separate
+  desktop-control permission is granted, for example export a BWA PDF or inspect
+  the assigned Leistungen for a client.
 - Search documents and receipts in DATEV document management.
 - Look up invoices, orders, fees, cost centers, and order values.
 - Inspect payroll clients, employees, salaries, working time, tax, and social
@@ -38,7 +42,7 @@ Availability depends on the DATEV modules enabled for your Klardaten account
 and connected DATEV environment. LODAS read access requires the
 Lohnaustauschdatenservice option to be enabled for the selected client.
 
-## Read and Write Access
+## Read, Write, and Desktop-Control Access
 
 Connections remain read-only unless the user explicitly grants the additional
 permission to create accounting sequences. Hosted clients, including Microsoft
@@ -47,13 +51,32 @@ Cowork, can use `datev_accounting_create_sequence` with the OAuth scope
 and opt in to this permission; refreshing a token does not add it. Local stdio
 connections remain read-only.
 
-This is the only supported write operation. It creates uncommitted
+Sequence creation creates uncommitted
 financial-accounting sequences for review and finalization in DATEV. The server
 cannot finalize sequences or edit or delete existing records.
 
 Sequence creation is not automatically retried. After a timeout or uncertain
 result, check DATEV for an already-created sequence before trying again to avoid
 duplicates.
+
+DATEV desktop control is a separate opt-in capability. It is available only when
+the Klardaten account has both `ui-agent:read` and `ui-agent:control`, and the user
+explicitly grants the OAuth scope `datev:ui-agent:control`. Existing connections
+must reconnect and opt in. Local stdio connections remain read-only.
+
+An assistant first asks `datev_ui_find_macros` for an optional, backend-owned
+macro. A matching versioned macro can be run with `datev_ui_run_macro`. Any other
+DATEV task can use the generic `datev_ui_observe` and `datev_ui_act` loop: the
+assistant receives a structured UI Automation view, performs small revision-bound
+actions, and observes the result. This means a new predefined workflow is not
+required for every task.
+
+Desktop actions run only in the configured Windows user's interactive session,
+never as LocalSystem. The runtime reuses an active console, Citrix, or RDP session;
+an optional virtual-RDP fallback can create one. If neither is available, the tool
+returns `interactive_session_required` and asks the user to sign in. UI actions
+are not automatically replayed after an uncertain result: the assistant must
+observe DATEV before deciding what to do next.
 
 ## Supported Clients
 
@@ -121,6 +144,16 @@ With the additional sequence-creation permission:
 
 ```text
 Create an uncommitted accounting sequence from these records for review in DATEV.
+```
+
+With the additional DATEV desktop-control permission:
+
+```text
+Export BWA number 1 for client 10005 and fiscal year 2025 as a PDF.
+```
+
+```text
+Show all enabled and assigned Leistungen for client 10005.
 ```
 
 ## Access
