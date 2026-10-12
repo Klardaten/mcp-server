@@ -66,8 +66,9 @@ is created. Updates fetch the complete record first, preserve omitted fields,
 and merge nested addresses, communications, bank accounts, tax offices, and
 contacts by ID. Unmentioned items remain. Historical edits include the complete
 history and matching current value together. `clearFields` explicitly clears
-optional nonhistorical scalar fields. Immutable fields, historical data, and
-collection items cannot be cleared or deleted through these tools.
+optional nonhistorical scalar fields. Immutable fields cannot change.
+`clearFields` cannot erase history or collections, and updates do not delete
+collection items.
 
 Master-data writes apply directly without a custom per-change approval
 workflow. Client-native confirmation controls may apply. Read–merge–PUT cannot
