@@ -38,6 +38,18 @@ Availability depends on the DATEV modules enabled for your Klardaten account
 and connected DATEV environment. LODAS read access requires the
 Lohnaustauschdatenservice option to be enabled for the selected client.
 
+## Document Search Add-on
+
+The optional document-search add-on provides `datev_dms_search` for document
+content and `datev_dms_search_metadata` for locally stored file metadata.
+Metadata listing accepts an omitted query and supports filename, description,
+keyword, indexing-status and date filters, including files awaiting extraction.
+Creation and modification ranges use inclusive DATEV local calendar days;
+these are separate from receipt dates and UTC indexing time. Results respect
+the selected DATEV profile's access rights. Incomplete metadata enrichment is
+reported as `search_meta.metadata_complete: false`; stored-file coverage is
+separate from the full live DATEV inventory available through `datev_dms_list`.
+
 ## Read and Write Access
 
 Connections remain read-only unless the user explicitly grants the additional
