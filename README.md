@@ -40,15 +40,23 @@ Lohnaustauschdatenservice option to be enabled for the selected client.
 
 ## Document Search Add-on
 
-The optional document-search add-on provides `datev_dms_search` for document
-content and `datev_dms_search_metadata` for locally stored file metadata.
-Metadata listing accepts an omitted query and supports filename, description,
-keyword, indexing-status and date filters, including files awaiting extraction.
-Creation and modification ranges use inclusive DATEV local calendar days;
-these are separate from receipt dates and UTC indexing time. Results respect
-the selected DATEV profile's access rights. Incomplete metadata enrichment is
-reported as `search_meta.metadata_complete: false`; stored-file coverage is
-separate from the full live DATEV inventory available through `datev_dms_list`.
+Choose the DMS tool by the information needed:
+
+| Request | Tool |
+| --- | --- |
+| Current DATEV inventory or filtering by document number, client, date, state or folder | Existing `datev_dms_list`; no text query required |
+| Find words in filenames, descriptions or keywords, or list indexed/pending files | Optional `datev_dms_search_metadata`; literal word/prefix matching in locally stored metadata, with no query required for listing |
+| Find text or facts inside documents, such as a contract's termination terms | Optional `datev_dms_search`; a nonempty content query, with date/client filters when needed |
+
+The optional metadata tool includes stored files awaiting or failing extraction.
+Stored metadata can lag DATEV and covers only locally stored files; current or
+complete live inventory requests use `datev_dms_list`. Metadata matches do not
+prove facts inside a document or replace evidence after a failed content search.
+
+Creation and modification ranges on the search tools use inclusive DATEV local
+calendar days, separate from receipt dates and UTC indexing time. Results
+respect the selected DATEV profile's access rights. Incomplete metadata
+enrichment is reported as `search_meta.metadata_complete: false`.
 
 ## Read and Write Access
 
