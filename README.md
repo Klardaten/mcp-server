@@ -100,6 +100,37 @@ Listing ten successfully indexed files needs no query:
 {"indexed": true, "pageSize": 10}
 ```
 
+### Document periods and business filters
+
+`datev_dms_search` returns DMS assessment year/month, additional years,
+receipt/document date, receipt number, amount, document class, correspondence
+partner firm number and order assignment. Results also include readable class,
+order, domain, folder, register, state, employee and DATEV user names when present.
+Missing source values remain unknown; these properties are not inferred from text.
+
+All three modes accept these structured filters:
+
+| Filter | Meaning |
+| --- | --- |
+| `year`, `yearFrom`, `yearTo`, `month` | Primary assessment year, inclusive year bounds and exact month |
+| `relatedYear` | Primary year or one of the additional `more_years` values |
+| `receiptFrom`, `receiptTo` | Inclusive receipt/document days in DATEV local time |
+| `receiptNumber` | Exact case-insensitive match, preserving leading zeros and punctuation |
+| `amount`, `amountMin`, `amountMax` | Exact decimal strings with inclusive bounds; no currency or grouping separators |
+| `classId`, `correspondencePartnerFirmNumber` | Exact DMS document class or correspondence partner firm number |
+| `orderId`, `orderNumber`, `orderCreationYear`, `orderAssessmentYear` | Order assignment; number plus creation year identifies an order precisely |
+| `className`, `orderName`, `domainName`, `folderName`, `registerName`, `stateName`, `employeeName`, `datevUserName` | Exact whole-name matching without case or diacritic sensitivity |
+
+Assessment periods, receipt dates and filing/modification dates are separate
+properties. An order number can repeat across creation years. Name labels are
+cached and can repeat across IDs; supplied filters combine with AND. General
+contains queries continue to cover filenames, descriptions and keywords.
+
+Amounts are returned as decimal strings, such as `"150.95"`, retaining exact value.
+The source amount does not establish a currency. Existing documents receive the
+new properties through metadata backfill without content reindexing. During that
+process `search_meta.metadata_complete: false` indicates incomplete coverage.
+
 ## Read and Write Access
 
 Connections remain read-only unless the user explicitly grants the additional
