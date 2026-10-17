@@ -45,18 +45,60 @@ Choose the DMS tool by the information needed:
 | Request | Tool |
 | --- | --- |
 | Current DATEV inventory or filtering by document number, client, date, state or folder | Existing `datev_dms_list`; no text query required |
-| Find words in filenames, descriptions or keywords, or list indexed/pending files | Optional `datev_dms_search_metadata`; literal word/prefix matching in locally stored metadata, with no query required for listing |
-| Find text or facts inside documents, such as a contract's termination terms | Optional `datev_dms_search`; a nonempty content query, with date/client filters when needed |
+| Find words in filenames, descriptions or keywords, or list indexed/pending files | Optional `datev_dms_search` with `mode: "metadata"`; literal contains matching, with no query required for listing |
+| Find text or facts inside documents, such as a contract's termination terms | Optional `datev_dms_search` with `mode: "content"`; a nonempty query, with date/client filters when needed |
 
-The optional metadata tool includes stored files awaiting or failing extraction.
+Metadata mode includes stored files awaiting or failing extraction.
 Stored metadata can lag DATEV and covers only locally stored files; current or
 complete live inventory requests use `datev_dms_list`. Metadata matches do not
 prove facts inside a document or replace evidence after a failed content search.
+
+A query without `mode` defaults to `hybrid`, combining body retrieval with
+metadata matching. Omitting both lists metadata by filters alone. Content and
+hybrid modes require a query and use `topK` (default 5, maximum 20). Metadata
+mode uses `pageSize` (default 10, maximum 100) and `cursor`. These pagination
+arguments cannot be mixed. The `filename` filter remains exact and case-insensitive.
+
+Metadata matching finds fragments in the middle of words, including German
+compounds, across filenames, descriptions and keywords. NFC-normalized Unicode
+alphanumeric terms of at least three characters are ANDed across fields in any
+order, without case or diacritic sensitivity. Shorter terms are ignored. A
+metadata query without eligible terms is rejected; hybrid keeps its content
+lane and reports `metadata_query_applied: false`. Query terms are literal;
+SQL wildcards, regex and FTS operators are not supported.
+
+Hybrid combines both ranked lanes with equal-weight reciprocal-rank fusion
+(k=60), deduplicating stored files while retaining separate attachments.
+`minScore` filters only the content lane. `match_sources` identifies content,
+filename, description and/or keywords. Metadata-only matches have no snippet,
+chunks or page reference and cannot establish body facts. Hybrid fails if a
+component or permission check fails. Results report effective mode and whether
+metadata matching was applied. A non-null `next_cursor` continues metadata
+pagination with the same profile, query and filters, even after an empty page;
+null ends the scan.
 
 Creation and modification ranges on the search tools use inclusive DATEV local
 calendar days, separate from receipt dates and UTC indexing time. Results
 respect the selected DATEV profile's access rights. Incomplete metadata
 enrichment is reported as `search_meta.metadata_complete: false`.
+
+Example MCP arguments:
+
+```json
+{"query": "Pharmacy", "topK": 5}
+```
+
+This defaults to hybrid. A contains-only search for fragments in names and labels:
+
+```json
+{"mode": "metadata", "query": "chnung ller", "pageSize": 10}
+```
+
+Listing ten successfully indexed files needs no query:
+
+```json
+{"indexed": true, "pageSize": 10}
+```
 
 ## Read and Write Access
 
