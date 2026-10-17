@@ -53,7 +53,7 @@ Stored metadata can lag DATEV and covers only locally stored files; current or
 complete live inventory requests use `datev_dms_list`. Metadata matches do not
 prove facts inside a document or replace evidence after a failed content search.
 
-A query without `mode` defaults to `hybrid`, combining body retrieval with
+A query without `mode` defaults to `content`, preserving body retrieval and relevance scores. Explicit `mode: "hybrid"` combines body retrieval with
 metadata matching. Omitting both lists metadata by filters alone. Content and
 hybrid modes require a query and use `topK` (default 5, maximum 20). Metadata
 mode uses `pageSize` (default 10, maximum 100) and `cursor`. These pagination
@@ -88,7 +88,7 @@ Example MCP arguments:
 {"query": "Pharmacy", "topK": 5}
 ```
 
-This defaults to hybrid. A contains-only search for fragments in names and labels:
+This defaults to content search. Use `"mode": "hybrid"` to combine content and metadata. A contains-only search for fragments in names and labels:
 
 ```json
 {"mode": "metadata", "query": "chnung ller", "pageSize": 10}
