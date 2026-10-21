@@ -23,6 +23,8 @@ Examples:
 - Create and update clients and addressees when the relevant master-data
   permission is granted.
 - Search documents and receipts in DATEV document management.
+- Upload original files and create DMS documents through supported native file
+  inputs, including Claude's interactive upload picker.
 - Look up invoices, orders, fees, cost centers, and order values.
 - Inspect payroll clients, employees, salaries, working time, tax, and social
   insurance data.
@@ -44,7 +46,7 @@ Lohnaustauschdatenservice option to be enabled for the selected client.
 ## Read and Write Access
 
 Connections remain read-only unless the user explicitly grants additional write
-permissions. Hosted clients, including ChatGPT, Langdock, and Microsoft Cowork,
+permissions. Hosted clients, including Claude, ChatGPT, Langdock, and Microsoft Cowork,
 can opt in to these permissions independently:
 
 | Capability | OAuth scope |
@@ -60,6 +62,12 @@ connections remain read-only.
 
 Sequence creation produces uncommitted financial-accounting sequences for
 review and finalization in DATEV; the server cannot finalize them.
+
+DMS document creation uses the original bytes supplied through a supported file
+input. In Claude, the interactive MCP App lets the user select the original
+file, verifies its upload, and returns a file reference for document creation.
+The selected destination and metadata are resolved separately. Claude does not
+need to reconstruct or transform the file.
 
 Master-data creation requires the linked addressees to exist before a client
 is created. Updates fetch the complete record first, preserve omitted fields,
@@ -88,6 +96,7 @@ Setup guides are available for:
 - Open WebUI
 - n8n
 - Langdock
+- [Claude](https://klardaten.com/en/docs/mcp-setup/claude)
 - Claude Code
 - Codex
 
