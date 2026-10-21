@@ -93,12 +93,16 @@ that support OAuth-based authentication.
 
 Setup guides are available for:
 
-- Open WebUI
-- n8n
-- Langdock
+- [Open WebUI](https://klardaten.com/en/docs/mcp-setup/open-webui)
+- [n8n](https://klardaten.com/en/docs/mcp-setup/n8n)
+- [Langdock](https://klardaten.com/en/docs/mcp-setup/langdock)
+- [amber](https://klardaten.com/en/docs/mcp-setup/amber)
 - [Claude](https://klardaten.com/en/docs/mcp-setup/claude)
-- Claude Code
-- Codex
+- [Claude Code](https://klardaten.com/en/docs/mcp-setup/claude-code)
+- [Codex](https://klardaten.com/en/docs/mcp-setup/codex)
+- [ChatGPT](https://klardaten.com/en/docs/mcp-setup/chatgpt)
+- [Copilot Cowork](https://klardaten.com/en/docs/mcp-setup/copilot-cowork)
+- [Copilot Studio](https://klardaten.com/en/docs/mcp-setup/copilot-studio)
 
 Other MCP-compatible clients can use the same connection details when they
 support MCP Streamable HTTP with OAuth.
@@ -119,9 +123,9 @@ OAuth 2.1 with dynamic client registration
 
 Full setup instructions:
 
-```text
-https://klardaten.com/docs/mcp-setup
-```
+- [MCP setup overview](https://klardaten.com/en/docs/mcp-setup)
+- [Individual DATEV profiles and dashboard setup links](https://klardaten.com/en/docs/mcp-setup/profiles)
+- [Document search](https://klardaten.com/en/docs/mcp-setup/document-search)
 
 ## Example Questions
 
@@ -163,11 +167,7 @@ To use the Klardaten DATEV MCP Server, you need:
 - Access to a connected DATEV environment through Klardaten.
 - An MCP-compatible client.
 
-Start here:
-
-```text
-https://klardaten.com/docs/mcp-setup
-```
+Start here: [MCP setup guide](https://klardaten.com/en/docs/mcp-setup).
 
 ## About Klardaten
 
