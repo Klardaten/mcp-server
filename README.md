@@ -3,8 +3,9 @@
 Connect AI assistants and automation tools to DATEV data through Klardaten.
 
 The Klardaten DATEV MCP Server provides access to DATEV data via the Klardaten
-DATEVconnect Gateway, with read access by default and optional creation of
-uncommitted accounting sequences (Buchungsstapel). It is built for German tax
+DATEVconnect Gateway, with read access by default and optional writes for
+uncommitted accounting sequences (Buchungsstapel), DMS documents, and client and
+addressee master data. It is built for German tax
 firms, accounting teams, and finance workflows that want to use DATEV data inside
 AI assistants, automation platforms, and MCP-compatible clients.
 
@@ -19,7 +20,11 @@ Examples:
 - Review bookings, balances, open receivables, and open payables.
 - Create uncommitted accounting sequences for review in DATEV when the additional
   permission is granted.
+- Create and update clients and addressees when the relevant master-data
+  permission is granted.
 - Search documents and receipts in DATEV document management.
+- Upload original files and create DMS documents through supported native file
+  inputs, including Claude's interactive upload picker.
 - Look up invoices, orders, fees, cost centers, and order values.
 - Inspect payroll clients, employees, salaries, working time, tax, and social
   insurance data.
@@ -40,20 +45,46 @@ Lohnaustauschdatenservice option to be enabled for the selected client.
 
 ## Read and Write Access
 
-Connections remain read-only unless the user explicitly grants the additional
-permission to create accounting sequences. Hosted clients, including Microsoft
-Cowork, can use `datev_accounting_create_sequence` with the OAuth scope
-`datev:accounting-sequences:create`. Existing read-only connections must reconnect
-and opt in to this permission; refreshing a token does not add it. Local stdio
+Connections remain read-only unless the user explicitly grants additional write
+permissions. Hosted clients, including Claude, ChatGPT, Langdock, and Microsoft Cowork,
+can opt in to these permissions independently:
+
+| Capability | OAuth scope |
+| --- | --- |
+| Create uncommitted accounting sequences | `datev:accounting-sequences:create` |
+| Upload original files and create DMS documents through supported native file inputs | `datev:dms-documents:create` |
+| Create clients and addressees | `datev:master-data:create` |
+| Update clients and addressees | `datev:master-data:update` |
+
+Existing connections must reconnect and explicitly select newly added
+permissions. Refreshing a token cannot add a permission. Local stdio
 connections remain read-only.
 
-This is the only supported write operation. It creates uncommitted
-financial-accounting sequences for review and finalization in DATEV. The server
-cannot finalize sequences or edit or delete existing records.
+Sequence creation produces uncommitted financial-accounting sequences for
+review and finalization in DATEV; the server cannot finalize them.
 
-Sequence creation is not automatically retried. After a timeout or uncertain
-result, check DATEV for an already-created sequence before trying again to avoid
-duplicates.
+DMS document creation uses the original bytes supplied through a supported file
+input. In Claude, the interactive MCP App lets the user select the original
+file, verifies its upload, and returns a file reference for document creation.
+The selected destination and metadata are resolved separately. Claude does not
+need to reconstruct or transform the file.
+
+Master-data creation requires the linked addressees to exist before a client
+is created. Updates fetch the complete record first, preserve omitted fields,
+and merge nested addresses, communications, bank accounts, tax offices, and
+contacts by ID. Unmentioned items remain. Historical edits include the complete
+history and matching current value together. `clearFields` explicitly clears
+optional nonhistorical scalar fields. Immutable fields cannot change.
+`clearFields` cannot erase history or collections, and updates do not delete
+collection items.
+
+Master-data writes apply directly without a custom per-change approval
+workflow. Client-native confirmation controls may apply. Read–merge–PUT cannot
+atomically protect against concurrent edits in DATEV.
+
+Writes are not automatically retried. After a timeout or uncertain result,
+verify DATEV through read-only lookups before another write attempt to avoid
+duplicates or unintended overwrites.
 
 ## Supported Clients
 
@@ -62,11 +93,16 @@ that support OAuth-based authentication.
 
 Setup guides are available for:
 
-- Open WebUI
-- n8n
-- Langdock
-- Claude Code
-- Codex
+- [Open WebUI](https://klardaten.com/en/docs/mcp-setup/open-webui)
+- [n8n](https://klardaten.com/en/docs/mcp-setup/n8n)
+- [Langdock](https://klardaten.com/en/docs/mcp-setup/langdock)
+- [amber](https://klardaten.com/en/docs/mcp-setup/amber)
+- [Claude](https://klardaten.com/en/docs/mcp-setup/claude)
+- [Claude Code](https://klardaten.com/en/docs/mcp-setup/claude-code)
+- [Codex](https://klardaten.com/en/docs/mcp-setup/codex)
+- [ChatGPT](https://klardaten.com/en/docs/mcp-setup/chatgpt)
+- [Copilot Cowork](https://klardaten.com/en/docs/mcp-setup/copilot-cowork)
+- [Copilot Studio](https://klardaten.com/en/docs/mcp-setup/copilot-studio)
 
 Other MCP-compatible clients can use the same connection details when they
 support MCP Streamable HTTP with OAuth.
@@ -87,9 +123,9 @@ OAuth 2.1 with dynamic client registration
 
 Full setup instructions:
 
-```text
-https://klardaten.com/docs/mcp-setup
-```
+- [MCP setup overview](https://klardaten.com/en/docs/mcp-setup)
+- [Individual DATEV profiles and dashboard setup links](https://klardaten.com/en/docs/mcp-setup/profiles)
+- [Document search](https://klardaten.com/en/docs/mcp-setup/document-search)
 
 ## Example Questions
 
@@ -131,11 +167,7 @@ To use the Klardaten DATEV MCP Server, you need:
 - Access to a connected DATEV environment through Klardaten.
 - An MCP-compatible client.
 
-Start here:
-
-```text
-https://klardaten.com/docs/mcp-setup
-```
+Start here: [MCP setup guide](https://klardaten.com/en/docs/mcp-setup).
 
 ## About Klardaten
 
