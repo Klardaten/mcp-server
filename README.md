@@ -124,7 +124,7 @@ OAuth 2.1 with dynamic client registration
 Full setup instructions:
 
 - [MCP setup overview](https://klardaten.com/en/docs/mcp-setup)
-- [Individual DATEV profiles and dashboard setup links](https://klardaten.com/en/docs/mcp-setup/profiles)
+- [Individual DATEV profiles](https://klardaten.com/en/docs/mcp-setup/profiles)
 - [Document search](https://klardaten.com/en/docs/mcp-setup/document-search)
 
 ## Example Questions
